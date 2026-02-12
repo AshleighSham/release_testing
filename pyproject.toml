@@ -1,9 +1,0 @@
-[tool.semantic_release]
-# File where your version is defined
-version_variable = "src/your_package/__init__.py:__version__" 
-version_toml = ["pyproject.toml:project.version"]
- 
-# GitHub integration settings
-branch = "main"
-upload_to_release = true  # Creates the GitHub Release automatically
-build_command = "pip install build && python -m build" # Creates .whl and .tar.gz
