@@ -1,30 +1,49 @@
-name: Automated Release
- 
+name: Simple Release
+
 on:
+
   push:
+
     branches: [main]
  
 jobs:
-  release:
+
+  build:
+
     runs-on: ubuntu-latest
-    concurrency: release
+
     permissions:
-      contents: write  # Critical for pushing tags and creating releases
- 
+
+      contents: write
+
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+
         with:
-          fetch-depth: 0  # Required to calculate version from history
+
+          fetch-depth: 0
  
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
+      - name: Bump version and push tag
+
+        id: tag_version
+
+        uses: mathieudutour/github-tag-action@v6.2
+
         with:
-          python-version: "3.11"
- 
-      - name: Python Semantic Release
-        id: release
-        uses: python-semantic-release/python-semantic-release@v9.16.1
-        with:
+
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          # No pypi_token needed; it will skip PyPI automatically if not provided
+ 
+      - name: Create a GitHub Release
+
+        uses: softprops/action-gh-release@v2
+
+        with:
+
+          tag_name: ${{ steps.tag_version.outputs.new_tag }}
+
+          name: Release ${{ steps.tag_version.outputs.new_tag }}
+
+          body: ${{ steps.tag_version.outputs.changelog }}
+
+ 
