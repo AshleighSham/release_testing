@@ -1,5 +1,5 @@
-name: Release
-
+name: Automated Release
+ 
 on:
   push:
     branches: [main]
@@ -9,18 +9,22 @@ jobs:
     runs-on: ubuntu-latest
     concurrency: release
     permissions:
-      contents: write   # Required to push tags/changelog and create GH Releases
-      id-token: write  # Required for passwordless PyPI publishing
+      contents: write  # Critical for pushing tags and creating releases
+ 
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Full history needed for version calculation
+          fetch-depth: 0  # Required to calculate version from history
+ 
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+ 
       - name: Python Semantic Release
         id: release
         uses: python-semantic-release/python-semantic-release@v9.16.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Publish to PyPI
-        if: steps.release.outputs.released == 'true'
-        uses: pypa/gh-action-pypi-publish@release/v1
+          # No pypi_token needed; it will skip PyPI automatically if not provided
